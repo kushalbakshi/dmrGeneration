@@ -1,12 +1,12 @@
 % Makes the dynamic moving ripple using Monty Escabi's toolbox.
 
 % Declare variables.
-flo       = 500;        % lower carrier frequency
-fhi       = 60000;      % upper carrier frequency 
+flo       = 5000;        % lower carrier frequency
+fhi       = 80000;      % upper carrier frequency 
 fRD      = 0.2;        % ripple density bandlimit frequency
 fFM      = 0.6;        % temporal modulation bandlimit frequency
-MaxRD    = 4;          % maximum ripple density (cycles/octave)
-MaxFM    = 40;			  % maximum modulation frequency (Hz)
+MaxRD    = [2,3,4];          % maximum ripple density (cycles/octave)
+MaxFM    = [40, 50, 100];			  % maximum modulation frequency (Hz)
 
 
 % App      = [10 20 30 40 50 30];	  % peak to peak ripple amplitude (dB)
@@ -17,10 +17,10 @@ App      = 40;       % peak to peak ripple amplitude (dB)
 
 Fs       = 200000;      % sampling rate
 
-minutes  = 15;
+minutes  = 1;
 M        = minutes * 60 * Fs;   % number of samples
 
-NS       = 316;        % number of sinusoid carriers
+NS       = [316, 600, 250];        % number of sinusoid carriers
                        % total (10 * MaxRD * #octaves)
 
 NB       = 1;       % number of blocks to divide parameter space
@@ -46,21 +46,14 @@ AmpDist  = 'dB';		  % modulation amplitude distribution
                                   %           modulation depth for 'lin'
                                   
 seed = 81817;       %change based on date if you wish
-
-
-filename = sprintf('dmr-%.0fflo-%.0ffhi-%.0fSM-%.0fTM-%.0fdb-%.0fkhz-%.0fDF-%.0fmin', ...
-                   flo, fhi, MaxRD, MaxFM, App, Fs, DF, minutes)
-
-% pause(1);
-
-
-ripnoise(filename, flo, fhi, fRD, fFM, MaxRD, MaxFM, App, M, Fs, NS, NB, Axis, Block, DF, AmpDist, seed);
-
-
-
-
-
-
-
-
-
+iter = 1;
+for rd = 1:numel(MaxRD)
+    for fm = 1:numel(MaxFM)
+        for ns = 1:numel(NS)
+            filename = sprintf('dmr-%.0fflo-%.0ffhi-%.0fSM-%.0fTM-%.0fdb-%.0fkhz-%.0fDF-%.0fmin-%.0fiter', ...
+                flo, fhi, MaxRD(1,rd), MaxFM(1,fm), App, Fs, DF, minutes, iter)
+            ripnoise(filename, flo, fhi, fRD, fFM, MaxRD(1,rd), MaxFM(1,fm), App, M, Fs, NS(1,ns), NB, Axis, Block, DF, AmpDist, seed);
+            iter = iter + 1;
+        end
+    end
+end
